@@ -1,14 +1,14 @@
-#  coding: utf-8 
+#  coding: utf-8
 import SocketServer
 
 # Copyright 2013 Abram Hindle, Eddie Antonio Santos
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,13 +26,35 @@ import SocketServer
 
 # try: curl -v -X GET http://127.0.0.1:8080/
 
+WHITE_LIST= ["html", "css"]
+
+
+def get_resp(req):
+    # response headers (taken 2016/01/07)
+    # see http://blog.scphillips.com/posts/2012/12/a-simple-python-webserver/
+    resp_ok = "HTTP/1.1 200 OK\nContent-Type: text/{}\n\n"
+    resp_err = "HTTP/1.1 404 Not Found\r\n"
+
+    # get file request from string
+    print req + "\n"
+    result = req.split(" ")[1]
+
+    # handle '/' request
+    if result == "/":
+        result = "index.html"
+
+    # if file is servable, return the content with the headers
+    if result.split(".")[-1] in WHITE_LIST:
+        return resp_ok.format(result.split(".")[-1]) + open("www/"+result).read()
+
+    else:
+        return resp_err
 
 class MyWebServer(SocketServer.BaseRequestHandler):
-    
     def handle(self):
-        self.data = self.request.recv(1024).strip()
-        print ("Got a request of: %s\n" % self.data)
-        self.request.sendall("OK")
+        self.req = self.request.recv(1024).strip()
+        self.request.sendall(get_resp(self.req))
+        self.request.close()
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 8080
@@ -44,3 +66,4 @@ if __name__ == "__main__":
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
     server.serve_forever()
+    # for example headers
