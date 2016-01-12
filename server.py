@@ -41,12 +41,14 @@ def get_resp(req):
 
     # handle '/' request
     if result[-1] == "/":
-        result = "index.html"
+        result += "index.html"
 
     # if file is servable, return the content with the headers
     if result.split(".")[-1] in WHITE_LIST:
-        return resp_ok.format(result.split(".")[-1]) + open("www/"+result).read()
-
+        try:
+            return resp_ok.format(result.split(".")[-1]) + open("www/"+result).read()
+        except:
+            return resp_err
     else:
         return resp_err
 
