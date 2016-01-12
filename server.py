@@ -40,7 +40,7 @@ def get_resp(req):
     result = req.split(" ")[1]
 
     # handle '/' request
-    if result == "/":
+    if result[-1] == "/":
         result = "index.html"
 
     # if file is servable, return the content with the headers
