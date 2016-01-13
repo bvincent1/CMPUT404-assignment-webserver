@@ -46,7 +46,7 @@ def get_resp(req):
     # if file is servable, return the content with the headers
     if result.split(".")[-1] in WHITE_LIST:
         try:
-            return resp_ok.format(result.split(".")[-1]) + open("www/"+result).read()
+            return resp_ok.format(result.split(".")[-1]) + open("www"+result).read()
         except:
             return resp_err
     else:
