@@ -28,34 +28,34 @@ import SocketServer
 
 WHITE_LIST= ["html", "css"]
 
-
-def get_resp(req):
-    # response headers (taken 2016/01/07)
-    # see http://blog.scphillips.com/posts/2012/12/a-simple-python-webserver/
-    resp_ok = "HTTP/1.1 200 OK\nContent-Type: text/{}\n\n"
-    resp_err = "HTTP/1.1 404 Not Found\r\n"
-
-    # get file request from string
-    print req + "\n"
-    result = req.split(" ")[1]
-
-    # handle '/' request
-    if result[-1] == "/":
-        result += "index.html"
-
-    # if file is servable, return the content with the headers
-    if result.split(".")[-1] in WHITE_LIST:
-        try:
-            return resp_ok.format(result.split(".")[-1]) + open("www"+result).read()
-        except:
-            return resp_err
-    else:
-        return resp_err
-
 class MyWebServer(SocketServer.BaseRequestHandler):
+    def get_resp(self, req):
+        # response headers (taken 2016/01/07)
+        # see http://blog.scphillips.com/posts/2012/12/a-simple-python-webserver/
+        resp_ok = "HTTP/1.1 200 OK\nContent-Type: text/{}\n\n"
+        resp_err = "HTTP/1.1 404 Not Found\r\n"
+
+        # get file request from string
+        print req + "\n"
+        result = req.split(" ")[1]
+
+        # handle '/' request
+        if result[-1] == "/":
+            result += "index.html"
+
+        # if file is servable, return the content with the headers
+        if result.split(".")[-1] in WHITE_LIST:
+            try:
+                return resp_ok.format(result.split(".")[-1]) + open("www"+result).read()
+            except:
+                return resp_err
+        else:
+            return resp_err
+
     def handle(self):
         self.req = self.request.recv(1024).strip()
-        self.request.sendall(get_resp(self.req))
+        self.resp = self.get_resp(self.req)
+        self.request.sendall(self.resp)
         self.request.close()
 
 if __name__ == "__main__":
